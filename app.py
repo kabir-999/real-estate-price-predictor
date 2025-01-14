@@ -3,31 +3,40 @@ import pandas as pd
 import joblib
 import os
 
-# 📌 Dynamically get the current directory
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
 # 📌 Load the trained model and scaler
+current_dir = os.path.dirname(os.path.abspath(__file__))
 gbr_model = joblib.load(os.path.join(current_dir, 'models', 'gbr_model.pkl'))
 scaler = joblib.load(os.path.join(current_dir, 'models', 'scaler.pkl'))
 
-# 📌 Streamlit App Title
-st.title("🏠 Real Estate Price Prediction App")
+# 📌 Define dropdown options
+status_options = ['Ready to Move', 'Under Construction']
+transaction_options = ['New Property', 'Resale']
+furnishing_options = ['Furnished', 'Semi-Furnished', 'Unfurnished']
+facing_options = ['East', 'West', 'North', 'South']
+ownership_options = ['Freehold', 'Leasehold']
+balcony_options = ['Yes', 'No']
+bathroom_options = [1, 2, 3, 4, 5, 6]
+car_parking_options = [0, 1, 2, 3, 4]
+floor_options = list(range(0, 51))
 
-# 📌 Input Fields
-area = st.number_input("Enter Area (in sqft)", min_value=100, max_value=10000, step=50)
-status = st.selectbox("Status", ['Ready to Move', 'Under Construction'])
-transaction = st.selectbox("Transaction Type", ['New Property', 'Resale'])
-furnishing = st.selectbox("Furnishing Status", ['Furnished', 'Semi-Furnished', 'Unfurnished'])
-facing = st.selectbox("Facing Direction", ['East', 'West', 'North', 'South'])
-ownership = st.selectbox("Ownership Type", ['Freehold', 'Leasehold'])
-balcony = st.selectbox("Balcony", ['Yes', 'No'])
-bathroom = st.number_input("Number of Bathrooms", min_value=1, max_value=10, step=1)
-car_parking = st.number_input("Car Parking Spaces", min_value=0, max_value=5, step=1)
-floor = st.number_input("Floor Number", min_value=0, max_value=50, step=1)
+# 📌 Streamlit Title
+st.title("🏠 Real Estate Price Prediction")
 
-# 📌 Predict Button
+# 📌 User Inputs
+area = st.number_input("Area (in sqft)", min_value=100, max_value=10000, step=50)
+status = st.selectbox("Status", status_options)
+transaction = st.selectbox("Transaction Type", transaction_options)
+furnishing = st.selectbox("Furnishing Status", furnishing_options)
+facing = st.selectbox("Facing Direction", facing_options)
+ownership = st.selectbox("Ownership Type", ownership_options)
+balcony = st.selectbox("Balcony", balcony_options)
+bathroom = st.selectbox("Number of Bathrooms", bathroom_options)
+car_parking = st.selectbox("Car Parking Spaces", car_parking_options)
+floor = st.selectbox("Floor Number", floor_options)
+
+# 📌 Prediction Button
 if st.button("Predict Price"):
-    # Prepare the input data
+    # Prepare input data
     user_data = {
         'Area': area,
         'Status': status,
@@ -42,22 +51,21 @@ if st.button("Predict Price"):
         'Price_per_sqft': area / (area + 1)
     }
 
-    # Convert to DataFrame
     input_df = pd.DataFrame([user_data])
 
-    # Encode categorical features
-    for col in ['Status', 'Transaction', 'Furnishing', 'Facing', 'Ownership', 'Balcony']:
-        input_df[col] = input_df[col].astype('category').cat.codes
+    # Encode categorical data
+    label_encodable_cols = ['Status', 'Transaction', 'Furnishing', 'Facing', 'Ownership', 'Balcony']
+    for col in label_encodable_cols:
+        input_df[col] = pd.factorize(input_df[col])[0]
 
-    # Align features with the model
-    model_features = ['Area', 'Status', 'Transaction', 'Furnishing', 'Facing', 'Ownership',
-                      'Balcony', 'Bathroom', 'Car Parking', 'Floor', 'Price_per_sqft']
-
+    # Align input with model features
+    model_features = ['Area', 'Status', 'Transaction', 'Furnishing', 'Facing',
+                      'Ownership', 'Balcony', 'Bathroom', 'Car Parking', 'Floor', 'Price_per_sqft']
     input_df = input_df[model_features]
 
-    # Scale input data
+    # Scale the input data
     input_scaled = scaler.transform(input_df)
 
-    # Predict
+    # Predict price
     predicted_price = gbr_model.predict(input_scaled)
     st.success(f"🏠 Predicted Property Price: ₹{round(predicted_price[0], 2)} Lakhs")

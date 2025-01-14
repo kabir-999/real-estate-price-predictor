@@ -1,44 +1,45 @@
-# 📌 Import Required Libraries
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.metrics import mean_squared_error, r2_score
 import joblib
 
-# 📌 Load Dataset
-df = pd.read_csv('./data/magicbricks_detailed_properties.csv')
+# 📌 Load dataset
+df = pd.read_csv('data/magicbricks_detailed_properties.csv')
+
+# 📌 Drop unnecessary columns
 df.drop(columns=['Location'], inplace=True)
 
-# 📌 Clean and Process Data
+# 📌 Clean data
 df['Price'] = df['Price'].str.replace(r'[^\d.]', '', regex=True).astype(float)
 df['Area'] = df['Area'].str.replace(r'[^\d.]', '', regex=True).astype(float)
+
+# 📌 Encode categorical features
+label_encodable_cols = ['Status', 'Transaction', 'Furnishing', 'Facing', 'Ownership', 'Balcony']
+encoder = LabelEncoder()
+for col in label_encodable_cols:
+    df[col] = encoder.fit_transform(df[col].astype(str))
+
+# 📌 Feature engineering
+df['Price_per_sqft'] = df['Price'] / (df['Area'] + 1)
 df.fillna(df.median(), inplace=True)
 
-# 📌 Encode Categorical Features
-label_encodable_cols = ['Status', 'Transaction', 'Furnishing', 'Facing', 'Ownership', 'Balcony']
-label_encoder = LabelEncoder()
-for col in label_encodable_cols:
-    df[col] = label_encoder.fit_transform(df[col].astype(str))
-
-# 📌 Feature Engineering
-df['Price_per_sqft'] = df['Price'] / (df['Area'] + 1)
-X = df.drop(columns=['Title', 'Price', 'Carpet Area', 'Overlooking'])
+# 📌 Split data
+X = df.drop(columns=['Price'])
 y = df['Price']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 📌 Scaling
+# 📌 Scale features
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# 📌 Train-Test Split
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+# 📌 Train model
+model = GradientBoostingRegressor(n_estimators=300, learning_rate=0.05, max_depth=6, random_state=42)
+model.fit(X_train_scaled, y_train)
 
-# 📌 Initialize and Train Model
-gbr_model = GradientBoostingRegressor(n_estimators=500, learning_rate=0.05, max_depth=6, random_state=42)
-gbr_model.fit(X_train, y_train)
+# 📌 Save model and scaler
+joblib.dump(model, 'models/gbr_model.pkl')
+joblib.dump(scaler, 'models/scaler.pkl')
 
-# 📌 Save the Model and Scaler
-joblib.dump(gbr_model, './models/gbr_model.pkl')
-joblib.dump(scaler, './models/scaler.pkl')
-
-print("✅ Model and Scaler saved successfully!")
+print("✅ Model training complete and saved!")
