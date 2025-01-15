@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import joblib
 import os
-from prediction import predict_price
+from scripts.prediction import predict_price
 
 app = Flask(__name__)
 
