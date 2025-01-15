@@ -1,12 +1,15 @@
 from flask import Flask, render_template, request
 from scripts.prediction import predict_price
+import pandas as pd
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     predicted_price = None
+
     if request.method == 'POST':
+        # Collect form data
         area = float(request.form['area'])
         status = request.form['status']
         transaction = request.form['transaction']
@@ -18,8 +21,7 @@ def home():
         car_parking = int(request.form['car_parking'])
         floor = int(request.form['floor'])
 
-        # Prepare input data as a DataFrame
-        import pandas as pd
+        # Prepare input data for prediction
         input_data = pd.DataFrame([{
             'Area': area,
             'Status': status,
@@ -29,14 +31,15 @@ def home():
             'Ownership': ownership,
             'Balcony': balcony,
             'Bathroom': bathroom,
-            'Car Parking': car_parking,
+            'Car_Parking': car_parking,
             'Floor': floor
         }])
 
-        # Get the prediction
+        # Predict the price
         predicted_price = predict_price(input_data)
+        predicted_price = round(predicted_price, 2)  # Rounded to 2 decimal places
 
     return render_template('index.html', predicted_price=predicted_price)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

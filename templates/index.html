@@ -8,103 +8,124 @@
         body {
             background-color: #f0f8ff;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
         .container {
-            width: 50%;
+            width: 60%;
             margin: auto;
             background-color: #fff;
-            padding: 20px;
-            box-shadow: 0px 0px 10px #ccc;
+            padding: 20px 40px 40px 40px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
             border-radius: 10px;
+            margin-top: 50px;
         }
         h1 {
             text-align: center;
+            color: #333;
         }
-        label, select, input {
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+        input, select {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
         }
         button {
             width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
+            padding: 12px;
+            background-color: #28a745;
             color: white;
+            font-size: 16px;
             border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #218838;
         }
         .result {
-            font-size: 18px;
-            color: green;
             margin-top: 20px;
+            padding: 15px;
+            background-color: #d4edda;
+            color: #155724;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>🏠 Real Estate Price Prediction</h1>
-    <form method="POST">
-        <label>Area (in sqft):</label>
-        <input type="number" name="area" required>
+    <div class="container">
+        <h1>🏠 Real Estate Price Prediction</h1>
+        
+        <form method="POST">
+            <label>Area (in sqft):</label>
+            <input type="number" name="area" required placeholder="Enter area in sqft">
 
-        <label>Status:</label>
-        <select name="status">
-            <option>Ready to Move</option>
-            <option>Under Construction</option>
-        </select>
+            <label>Status:</label>
+            <select name="status" required>
+                <option value="Ready to Move">Ready to Move</option>
+                <option value="Under Construction">Under Construction</option>
+            </select>
 
-        <label>Transaction Type:</label>
-        <select name="transaction">
-            <option>New Property</option>
-            <option>Resale</option>
-        </select>
+            <label>Transaction Type:</label>
+            <select name="transaction" required>
+                <option value="New Property">New Property</option>
+                <option value="Resale">Resale</option>
+            </select>
 
-        <label>Furnishing:</label>
-        <select name="furnishing">
-            <option>Furnished</option>
-            <option>Semi-Furnished</option>
-            <option>Unfurnished</option>
-        </select>
+            <label>Furnishing:</label>
+            <select name="furnishing" required>
+                <option value="Furnished">Furnished</option>
+                <option value="Semi-Furnished">Semi-Furnished</option>
+                <option value="Unfurnished">Unfurnished</option>
+            </select>
 
-        <label>Facing:</label>
-        <select name="facing">
-            <option>East</option>
-            <option>West</option>
-            <option>North</option>
-            <option>South</option>
-        </select>
+            <label>Facing:</label>
+            <select name="facing" required>
+                <option value="East">East</option>
+                <option value="West">West</option>
+                <option value="North">North</option>
+                <option value="South">South</option>
+            </select>
 
-        <label>Ownership:</label>
-        <select name="ownership">
-            <option>Freehold</option>
-            <option>Leasehold</option>
-        </select>
+            <label>Ownership:</label>
+            <select name="ownership" required>
+                <option value="Freehold">Freehold</option>
+                <option value="Leasehold">Leasehold</option>
+            </select>
 
-        <label>Balcony:</label>
-        <select name="balcony">
-            <option>Yes</option>
-            <option>No</option>
-        </select>
+            <label>Balcony:</label>
+            <select name="balcony" required>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select>
 
-        <label>Number of Bathrooms:</label>
-        <input type="number" name="bathroom" required>
+            <label>Number of Bathrooms:</label>
+            <input type="number" name="bathroom" required min="1" placeholder="Enter number of bathrooms">
 
-        <label>Car Parking:</label>
-        <input type="number" name="car_parking" required>
+            <label>Car Parking:</label>
+            <input type="number" name="car_parking" required min="0" placeholder="Enter number of car parking slots">
 
-        <label>Floor Number:</label>
-        <input type="number" name="floor" required>
+            <label>Floor Number:</label>
+            <input type="number" name="floor" required min="0" placeholder="Enter floor number">
 
-        <button type="submit">Predict Price</button>
-    </form>
+            <button type="submit">Predict Price</button>
+        </form>
 
-    {% if predicted_price %}
-    <div class="result">
-        <strong>🏷 Predicted Property Price: ₹{{ predicted_price }} Crores</strong>
+        {% if predicted_price %}
+            <div class="result">
+                🏷 <strong>Predicted Property Price: ₹{{ predicted_price }} Crores</strong>
+            </div>
+        {% endif %}
     </div>
-    {% endif %}
-</div>
 </body>
 </html>
