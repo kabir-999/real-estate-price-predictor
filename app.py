@@ -1,71 +1,69 @@
-import streamlit as st
-import pandas as pd
+from flask import Flask, render_template, request
 import joblib
+import numpy as np
 import os
 
-# 📌 Load the trained model and scaler
+app = Flask(__name__)
+
+# Load the trained model and scaler
 current_dir = os.path.dirname(os.path.abspath(__file__))
-gbr_model = joblib.load(os.path.join(current_dir, 'models', 'gbr_model.pkl'))
-scaler = joblib.load(os.path.join(current_dir, 'models', 'scaler.pkl'))
+model_path = os.path.join(current_dir, 'models', 'gbr_model.pkl')
+scaler_path = os.path.join(current_dir, 'models', 'scaler.pkl')
 
-# 📌 Define dropdown options
-status_options = ['Ready to Move', 'Under Construction']
-transaction_options = ['New Property', 'Resale']
-furnishing_options = ['Furnished', 'Semi-Furnished', 'Unfurnished']
-facing_options = ['East', 'West', 'North', 'South']
-ownership_options = ['Freehold', 'Leasehold']
-balcony_options = ['Yes', 'No']
-bathroom_options = [1, 2, 3, 4, 5, 6]
-car_parking_options = [0, 1, 2, 3, 4]
-floor_options = list(range(0, 51))
+gbr_model = joblib.load(model_path)
+scaler = joblib.load(scaler_path)
 
-# 📌 Streamlit Title
-st.title("🏠 Real Estate Price Prediction")
+# Encoding dictionaries for categorical inputs
+status_dict = {'Ready to Move': 1, 'Under Construction': 0}
+transaction_dict = {'New Property': 1, 'Resale': 0}
+furnishing_dict = {'Furnished': 2, 'Semi-Furnished': 1, 'Unfurnished': 0}
+facing_dict = {'East': 0, 'West': 1, 'North': 2, 'South': 3}
+ownership_dict = {'Freehold': 1, 'Leasehold': 0}
+balcony_dict = {'Yes': 1, 'No': 0}
 
-# 📌 User Inputs
-area = st.number_input("Area (in sqft)", min_value=100, max_value=10000, step=50)
-status = st.selectbox("Status", status_options)
-transaction = st.selectbox("Transaction Type", transaction_options)
-furnishing = st.selectbox("Furnishing Status", furnishing_options)
-facing = st.selectbox("Facing Direction", facing_options)
-ownership = st.selectbox("Ownership Type", ownership_options)
-balcony = st.selectbox("Balcony", balcony_options)
-bathroom = st.selectbox("Number of Bathrooms", bathroom_options)
-car_parking = st.selectbox("Car Parking Spaces", car_parking_options)
-floor = st.selectbox("Floor Number", floor_options)
+@app.route("/", methods=["GET", "POST"])
+def index():
+    predicted_price = None
 
-# 📌 Prediction Button
-if st.button("Predict Price"):
-    # Prepare input data
-    user_data = {
-        'Area': area,
-        'Status': status,
-        'Transaction': transaction,
-        'Furnishing': furnishing,
-        'Facing': facing,
-        'Ownership': ownership,
-        'Balcony': balcony,
-        'Bathroom': bathroom,
-        'Car Parking': car_parking,
-        'Floor': floor,
-        'Price_per_sqft': area / (area + 1)
-    }
+    if request.method == "POST":
+        try:
+            # Collect input data
+            area = float(request.form["area"])
+            status = request.form["status"]
+            transaction = request.form["transaction"]
+            furnishing = request.form["furnishing"]
+            facing = request.form["facing"]
+            ownership = request.form["ownership"]
+            balcony = request.form["balcony"]
+            bathroom = int(request.form["bathroom"])
+            car_parking = int(request.form["car_parking"])
+            floor = int(request.form["floor"])
 
-    input_df = pd.DataFrame([user_data])
+            # Preprocess input
+            input_features = np.array([
+                area,
+                status_dict[status],
+                transaction_dict[transaction],
+                furnishing_dict[furnishing],
+                facing_dict[facing],
+                ownership_dict[ownership],
+                balcony_dict[balcony],
+                bathroom,
+                car_parking,
+                floor,
+                area / (area + 1)
+            ]).reshape(1, -1)
 
-    # Encode categorical data
-    label_encodable_cols = ['Status', 'Transaction', 'Furnishing', 'Facing', 'Ownership', 'Balcony']
-    for col in label_encodable_cols:
-        input_df[col] = pd.factorize(input_df[col])[0]
+            # Scale the features
+            scaled_features = scaler.transform(input_features)
 
-    # Align input with model features
-    model_features = ['Area', 'Status', 'Transaction', 'Furnishing', 'Facing',
-                      'Ownership', 'Balcony', 'Bathroom', 'Car Parking', 'Floor', 'Price_per_sqft']
-    input_df = input_df[model_features]
+            # Predict the price
+            predicted_price = round(gbr_model.predict(scaled_features)[0], 2)
 
-    # Scale the input data
-    input_scaled = scaler.transform(input_df)
+        except Exception as e:
+            predicted_price = f"Error: {e}"
 
-    # Predict price
-    predicted_price = gbr_model.predict(input_scaled)
-    st.success(f"🏠 Predicted Property Price: ₹{round(predicted_price[0], 2)} Lakhs")
+    return render_template("index.html", predicted_price=predicted_price)
+
+if __name__ == "__main__":
+    app.run(debug=True)

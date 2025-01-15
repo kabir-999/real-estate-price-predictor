@@ -1,51 +1,68 @@
-import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+from flask import Flask, render_template, request
 import joblib
+import numpy as np
+import os
 
-# 📌 Load the Trained Model and Scaler
-gbr_model = joblib.load('./models/gbr_model.pkl')
-scaler = joblib.load('./models/scaler.pkl')
+app = Flask(__name__)
 
-# 📌 User Input
-def user_input_prediction():
-    area = float(input("Enter Area in sqft (e.g., 2500): "))
-    status = input("Choose Status (Ready to Move / Under Construction): ")
-    transaction = input("Choose Transaction Type (New Property / Resale): ")
-    furnishing = input("Choose Furnishing Status (Furnished / Semi-Furnished / Unfurnished): ")
-    facing = input("Choose Facing Direction (East / West / North / South): ")
-    ownership = input("Choose Ownership Type (Freehold / Leasehold): ")
-    balcony = input("Does it have a Balcony? (Yes/No): ")
-    bathroom = int(input("Enter Number of Bathrooms: "))
-    car_parking = int(input("Enter Number of Car Parking Spaces: "))
-    floor = int(input("Enter Floor Number: "))
+# 📌 Load Model and Scaler
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(current_dir, 'models', 'gbr_model.pkl')
+scaler_path = os.path.join(current_dir, 'models', 'scaler.pkl')
 
-    # 📌 Prepare Data
-    user_data = {
-        'Area': area,
-        'Status': status,
-        'Transaction': transaction,
-        'Furnishing': furnishing,
-        'Facing': facing,
-        'Ownership': ownership,
-        'Balcony': balcony,
-        'Bathroom': bathroom,
-        'Car Parking': car_parking,
-        'Floor': floor,
-        'Price_per_sqft': area / (area + 1)
-    }
-    
-    input_df = pd.DataFrame([user_data])
-    label_encodable_cols = ['Status', 'Transaction', 'Furnishing', 'Facing', 'Ownership', 'Balcony']
-    
-    label_encoder = LabelEncoder()
-    for col in label_encodable_cols:
-        input_df[col] = label_encoder.fit_transform(input_df[col].astype(str))
+model = joblib.load(model_path)
+scaler = joblib.load(scaler_path)
 
-    # 📌 Align and Scale
-    input_scaled = scaler.transform(input_df)
-    
-    # 📌 Prediction
-    predicted_price = gbr_model.predict(input_scaled)
-    print(f"\n🏠 Predicted Property Price: ₹{round(predicted_price[0], 2)} Lakhs\n")
+# 📌 Dictionaries for Encoding
+status_dict = {'Ready to Move': 1, 'Under Construction': 0}
+transaction_dict = {'New Property': 1, 'Resale': 0}
+furnishing_dict = {'Furnished': 2, 'Semi-Furnished': 1, 'Unfurnished': 0}
+facing_dict = {'East': 0, 'West': 1, 'North': 2, 'South': 3}
+ownership_dict = {'Freehold': 1, 'Leasehold': 0}
+balcony_dict = {'Yes': 1, 'No': 0}
 
-user_input_prediction()
+# 📌 Home Page
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+# 📌 Prediction Endpoint
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        area = float(request.form['area'])
+        status = request.form['status']
+        transaction = request.form['transaction']
+        furnishing = request.form['furnishing']
+        facing = request.form['facing']
+        ownership = request.form['ownership']
+        balcony = request.form['balcony']
+        bathroom = int(request.form['bathroom'])
+        car_parking = int(request.form['car_parking'])
+
+        # 📌 Encode Input
+        input_data = np.array([
+            area,
+            status_dict[status],
+            transaction_dict[transaction],
+            furnishing_dict[furnishing],
+            facing_dict[facing],
+            ownership_dict[ownership],
+            balcony_dict[balcony],
+            bathroom,
+            car_parking,
+            area / (area + 1)  # Derived feature
+        ]).reshape(1, -1)
+
+        # 📌 Scale Input
+        scaled_input = scaler.transform(input_data)
+
+        # 📌 Predict
+        prediction = model.predict(scaled_input)[0]
+        return render_template('result.html', price=round(prediction, 2))
+
+    except Exception as e:
+        return f"Error: {e}"
+
+if __name__ == "__main__":
+    app.run(debug=True)

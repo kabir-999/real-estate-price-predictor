@@ -1,29 +1,19 @@
-# Ignore Python cache files
+# Python Files
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 
-# Ignore virtual environment folders
-venv/
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Environment
 env/
+venv/
+*.env
 
-# Ignore model files
-models/*.pkl
-models/*.h5
-models/*.joblib
+# Model Files
+/models/*.pkl
 
-# Ignore dataset files
-data/*.csv
-data/*.xlsx
-
-# Ignore log files
-*.log
-
-# Ignore system files
-.DS_Store  # macOS
-Thumbs.db  # Windows
-
-# Ignore Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-# Ignore environment files
-.env
+# Data Files
+/data/*.csv
