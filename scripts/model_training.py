@@ -17,12 +17,7 @@ df['Area'] = df['Area'].str.replace(r'[^\d.]', '', regex=True).astype(float)
 # Clean the 'Price' column
 df['Price'] = df['Price'].str.replace(r'[^\d.]', '', regex=True).astype(float)
 
-# Clean 'Carpet Area' column
-df['Carpet Area'] = df['Carpet Area'].str.replace(r'[^\d.]', '', regex=True)
-df['Carpet Area'] = pd.to_numeric(df['Carpet Area'], errors='coerce')
-
 # Fill missing numerical values with the median
-df['Carpet Area'].fillna(df['Carpet Area'].median(), inplace=True)
 df['Area'].fillna(df['Area'].median(), inplace=True)
 
 # Fill missing categorical values with mode
@@ -43,14 +38,14 @@ for col in categorical_cols:
     df[col] = encoder.fit_transform(df[col])
 
 # Clean 'Car Parking' feature
-df['Car Parking'] = df['Car Parking'].str.extract(r'(\d+)').astype(float)
+df['Car Parking'] = df['Car Parking'].astype(str).str.extract(r'(\d+)').astype(float)
 df['Car Parking'].fillna(0, inplace=True)
 
 # Convert 'Bathroom' to numeric
 df['Bathroom'] = df['Bathroom'].replace({'> 10': 11}).astype(int)
 
-# Define features and target
-features = ['Area', 'Carpet Area', 'Status', 'Floor', 'Transaction', 
+# Define features and target (Removed 'Carpet Area')
+features = ['Area', 'Status', 'Floor', 'Transaction', 
             'Furnishing', 'Facing', 'Ownership', 'Car Parking', 'Bathroom', 'Balcony']
 X = df[features]
 y = df['Price']

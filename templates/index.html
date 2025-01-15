@@ -5,13 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Real Estate Price Prediction</title>
     <style>
-        body { background-color: #f0f8ff; font-family: Arial, sans-serif; }
-        .container { width: 50%; margin: auto; background-color: #fff; padding: 20px; box-shadow: 0px 0px 10px #ccc; border-radius: 10px; }
-        h1 { text-align: center; }
-        input, select { width: 100%; padding: 8px; margin-top: 5px; }
-        button { width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; margin-top: 15px; }
-        button:hover { background-color: #45a049; }
-        .result { margin-top: 20px; font-size: 18px; color: green; }
+        body {
+            background-color: #f0f8ff;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px #ccc;
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -19,29 +61,29 @@
         <h1>🏠 Real Estate Price Prediction</h1>
         <form method="POST">
             <label>Area (in sqft):</label>
-            <input type="number" name="area" required>
+            <input type="number" name="Area" required>
 
             <label>Status:</label>
-            <select name="status">
+            <select name="Status">
                 <option>Ready to Move</option>
                 <option>Under Construction</option>
             </select>
 
             <label>Transaction Type:</label>
-            <select name="transaction">
+            <select name="Transaction">
                 <option>New Property</option>
                 <option>Resale</option>
             </select>
 
             <label>Furnishing:</label>
-            <select name="furnishing">
+            <select name="Furnishing">
                 <option>Furnished</option>
                 <option>Semi-Furnished</option>
                 <option>Unfurnished</option>
             </select>
 
             <label>Facing:</label>
-            <select name="facing">
+            <select name="Facing">
                 <option>East</option>
                 <option>West</option>
                 <option>North</option>
@@ -49,32 +91,32 @@
             </select>
 
             <label>Ownership:</label>
-            <select name="ownership">
+            <select name="Ownership">
                 <option>Freehold</option>
                 <option>Leasehold</option>
             </select>
 
             <label>Balcony:</label>
-            <select name="balcony">
+            <select name="Balcony">
                 <option>Yes</option>
                 <option>No</option>
             </select>
 
             <label>Number of Bathrooms:</label>
-            <input type="number" name="bathroom" required>
+            <input type="number" name="Bathroom" min="1" required>
 
             <label>Car Parking:</label>
-            <input type="number" name="car_parking" required>
+            <input type="number" name="Car Parking" min="0" required>
 
             <label>Floor Number:</label>
-            <input type="number" name="floor" required>
+            <input type="number" name="Floor" min="0" required>
 
             <button type="submit">Predict Price</button>
         </form>
 
         {% if predicted_price %}
             <div class="result">
-                <strong>🏷 Predicted Property Price: ₹{{ predicted_price }} Crores</strong>
+                🏷 Predicted Property Price: ₹ {{ predicted_price }} Crores
             </div>
         {% endif %}
     </div>
