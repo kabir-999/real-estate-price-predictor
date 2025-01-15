@@ -11,7 +11,7 @@ def index():
 
     if request.method == 'POST':
         try:
-            # Collect input data from form
+            # Collect input data from the form
             area = float(request.form['area'])
             status = request.form['status']
             transaction = request.form['transaction']
@@ -43,9 +43,10 @@ def index():
             if predicted_price is not None:
                 predicted_price = round(predicted_price, 2)
             else:
-                error_message = "Prediction failed. Please try again."
+                error_message = "Error occurred during prediction."
 
         except Exception as e:
+            print(f"❌ Error during prediction: {e}")
             error_message = f"Error occurred: {e}"
 
     return render_template('index.html', predicted_price=predicted_price, error_message=error_message)

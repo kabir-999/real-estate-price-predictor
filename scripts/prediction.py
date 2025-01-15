@@ -18,8 +18,11 @@ def predict_price(input_data):
     try:
         # Scale the input data
         input_scaled = scaler.transform(input_data)
+
+        # Predict price
         prediction = gbr_model.predict(input_scaled)
         return prediction[0]
+
     except Exception as e:
         print(f"❌ Prediction Error: {e}")
         return None
