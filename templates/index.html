@@ -69,6 +69,12 @@
                 <strong>🏷 Predicted Property Price: ₹{{ predicted_price }} Crores</strong>
             </div>
         {% endif %}
+
+        {% if error_message %}
+            <div class="error">
+                <strong>⚠️ {{ error_message }}</strong>
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>

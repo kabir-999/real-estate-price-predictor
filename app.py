@@ -7,9 +7,11 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def index():
     predicted_price = None
+    error_message = None
+
     if request.method == 'POST':
         try:
-            # Collect input data
+            # Collect input data from form
             area = float(request.form['area'])
             status = request.form['status']
             transaction = request.form['transaction']
@@ -37,13 +39,16 @@ def index():
 
             # Predict price
             predicted_price = predict_price(input_data)
-            predicted_price = round(predicted_price, 2)
+
+            if predicted_price is not None:
+                predicted_price = round(predicted_price, 2)
+            else:
+                error_message = "Prediction failed. Please try again."
 
         except Exception as e:
-            print(f"❌ Error: {e}")
-            predicted_price = "Error occurred. Please try again."
+            error_message = f"Error occurred: {e}"
 
-    return render_template('index.html', predicted_price=predicted_price)
+    return render_template('index.html', predicted_price=predicted_price, error_message=error_message)
 
 if __name__ == '__main__':
     app.run(debug=True)

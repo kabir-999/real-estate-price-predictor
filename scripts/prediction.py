@@ -1,11 +1,12 @@
 import os
 import joblib
 
-# Correct path to model and scaler
+# Define the correct path to the model and scaler
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(BASE_DIR, '..', 'models', 'gbr_model.pkl')
 scaler_path = os.path.join(BASE_DIR, '..', 'models', 'scaler.pkl')
 
+# Load the model and scaler
 try:
     gbr_model = joblib.load(model_path)
     scaler = joblib.load(scaler_path)
@@ -15,7 +16,7 @@ except Exception as e:
 
 def predict_price(input_data):
     try:
-        # Scaling the input data
+        # Scale the input data
         input_scaled = scaler.transform(input_data)
         prediction = gbr_model.predict(input_scaled)
         return prediction[0]
