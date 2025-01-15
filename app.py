@@ -1,17 +1,16 @@
 from flask import Flask, render_template, request
-from scripts.prediction import predict_price
 import pandas as pd
+from scripts.prediction import predict_price
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
-def index():
+def home():
     predicted_price = None
-    error_message = None
 
     if request.method == 'POST':
         try:
-            # Collect input data from the form
+            # Collect user input
             area = float(request.form['area'])
             status = request.form['status']
             transaction = request.form['transaction']
@@ -23,7 +22,7 @@ def index():
             car_parking = int(request.form['car_parking'])
             floor = int(request.form['floor'])
 
-            # Prepare data for prediction
+            # Prepare the data in DataFrame format
             input_data = pd.DataFrame([{
                 'Area': area,
                 'Status': status,
@@ -37,19 +36,14 @@ def index():
                 'Floor': floor
             }])
 
-            # Predict price
+            # Predict the price
             predicted_price = predict_price(input_data)
-
-            if predicted_price is not None:
-                predicted_price = round(predicted_price, 2)
-            else:
-                error_message = "Error occurred during prediction."
-
+        
         except Exception as e:
-            print(f"❌ Error during prediction: {e}")
-            error_message = f"Error occurred: {e}"
+            print(f"❌ Error in app.py: {e}")
+            predicted_price = "Prediction failed. Please try again."
 
-    return render_template('index.html', predicted_price=predicted_price, error_message=error_message)
+    return render_template('index.html', predicted_price=predicted_price)
 
 if __name__ == '__main__':
     app.run(debug=True)
