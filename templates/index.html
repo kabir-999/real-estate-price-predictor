@@ -20,13 +20,9 @@
         h1 {
             text-align: center;
         }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-        input, select {
+        label, select, input {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             margin-top: 5px;
         }
         button {
@@ -35,82 +31,80 @@
             background-color: #4CAF50;
             color: white;
             border: none;
-            cursor: pointer;
-            margin-top: 15px;
         }
         button:hover {
             background-color: #45a049;
         }
         .result {
-            margin-top: 20px;
             font-size: 18px;
             color: green;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🏠 Real Estate Price Prediction</h1>
-        <form method="POST">
-            <label>Area (in sqft):</label>
-            <input type="number" name="area" required>
+<div class="container">
+    <h1>🏠 Real Estate Price Prediction</h1>
+    <form method="POST">
+        <label>Area (in sqft):</label>
+        <input type="number" name="area" required>
 
-            <label>Status:</label>
-            <select name="status">
-                <option>Ready to Move</option>
-                <option>Under Construction</option>
-            </select>
+        <label>Status:</label>
+        <select name="status">
+            <option>Ready to Move</option>
+            <option>Under Construction</option>
+        </select>
 
-            <label>Transaction Type:</label>
-            <select name="transaction">
-                <option>New Property</option>
-                <option>Resale</option>
-            </select>
+        <label>Transaction Type:</label>
+        <select name="transaction">
+            <option>New Property</option>
+            <option>Resale</option>
+        </select>
 
-            <label>Furnishing:</label>
-            <select name="furnishing">
-                <option>Furnished</option>
-                <option>Semi-Furnished</option>
-                <option>Unfurnished</option>
-            </select>
+        <label>Furnishing:</label>
+        <select name="furnishing">
+            <option>Furnished</option>
+            <option>Semi-Furnished</option>
+            <option>Unfurnished</option>
+        </select>
 
-            <label>Facing:</label>
-            <select name="facing">
-                <option>East</option>
-                <option>West</option>
-                <option>North</option>
-                <option>South</option>
-            </select>
+        <label>Facing:</label>
+        <select name="facing">
+            <option>East</option>
+            <option>West</option>
+            <option>North</option>
+            <option>South</option>
+        </select>
 
-            <label>Ownership:</label>
-            <select name="ownership">
-                <option>Freehold</option>
-                <option>Leasehold</option>
-            </select>
+        <label>Ownership:</label>
+        <select name="ownership">
+            <option>Freehold</option>
+            <option>Leasehold</option>
+        </select>
 
-            <label>Balcony:</label>
-            <select name="balcony">
-                <option>Yes</option>
-                <option>No</option>
-            </select>
+        <label>Balcony:</label>
+        <select name="balcony">
+            <option>Yes</option>
+            <option>No</option>
+        </select>
 
-            <label>Number of Bathrooms:</label>
-            <input type="number" name="bathroom" required>
+        <label>Number of Bathrooms:</label>
+        <input type="number" name="bathroom" required>
 
-            <label>Car Parking:</label>
-            <input type="number" name="car_parking" required>
+        <label>Car Parking:</label>
+        <input type="number" name="car_parking" required>
 
-            <label>Floor Number:</label>
-            <input type="number" name="floor" required>
+        <label>Floor Number:</label>
+        <input type="number" name="floor" required>
 
-            <button type="submit">Predict Price</button>
-        </form>
+        <button type="submit">Predict Price</button>
+    </form>
 
-        {% if predicted_price %}
-            <div class="result">
-                <strong>🏷 Predicted Property Price: ₹{{ predicted_price }} Crores</strong>
-            </div>
-        {% endif %}
+    {% if predicted_price %}
+    <div class="result">
+        <strong>🏷 Predicted Property Price: ₹{{ predicted_price }} Crores</strong>
     </div>
+    {% endif %}
+</div>
 </body>
 </html>
