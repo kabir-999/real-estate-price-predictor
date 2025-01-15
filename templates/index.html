@@ -47,12 +47,17 @@
         button:hover {
             background-color: #45a049;
         }
-        .result {
+        .result, .error {
             margin-top: 20px;
             font-size: 18px;
             font-weight: bold;
-            color: green;
             text-align: center;
+        }
+        .error {
+            color: red;
+        }
+        .result {
+            color: green;
         }
     </style>
 </head>
@@ -113,6 +118,12 @@
 
             <button type="submit">Predict Price</button>
         </form>
+
+        {% if error_message %}
+            <div class="error">
+                ❌ {{ error_message }}
+            </div>
+        {% endif %}
 
         {% if predicted_price %}
             <div class="result">
