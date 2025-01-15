@@ -7,8 +7,10 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def home():
     predicted_price = None
+
     if request.method == 'POST':
         try:
+            # Capture user input
             input_data = pd.DataFrame({
                 'Area': [float(request.form['area'])],
                 'Status': [request.form['status']],
@@ -22,11 +24,12 @@ def home():
                 'Floor': [float(request.form['floor'])]
             })
 
+            # Call prediction
             predicted_price = predict_price(input_data)
-        
+            
         except Exception as e:
-            print(f"❌ Error in app prediction flow: {e}")
-            predicted_price = "Error occurred during prediction."
+            print(f"❌ App Error: {e}")
+            predicted_price = "Error occurred. Please check your input."
 
     return render_template('index.html', predicted_price=predicted_price)
 
