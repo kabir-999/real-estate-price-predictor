@@ -40,22 +40,37 @@ def encode_categorical(data):
 
 def predict_price(input_data):
     try:
-        numeric_fields = ['Area', 'Bathroom', 'Car Parking', 'Floor']
-        for field in numeric_fields:
+        # Clean and validate numeric inputs
+        numeric_fields = {
+            'Area': (0, 4000),
+            'Bathroom': (0, 10),
+            'Car Parking': (0, 10),
+            'Floor': (0, 50)
+        }
+
+        for field, (min_val, max_val) in numeric_fields.items():
             value = clean_numeric(input_data.get(field))
-            if value is None or value < 0:
-                return None, f"Invalid input: {field} cannot be negative."
+            if value is None:
+                return None, f"Invalid input: {field} must be a number."
+            if not (min_val <= value <= max_val):
+                return None, f"Invalid input: {field} must be between {min_val} and {max_val}."
             input_data[field] = value
 
+        # Encode categorical inputs
         input_data = encode_categorical(input_data)
 
+        # Define the correct order of features as per the trained model
         features_order = ['Area', 'Status', 'Floor', 'Transaction',
                           'Furnishing', 'Facing', 'Ownership',
                           'Car Parking', 'Bathroom', 'Balcony']
 
+        # Prepare input for prediction in the correct order
         input_values = [input_data.get(feature, 0) for feature in features_order]
 
+        # Scale the input data
         input_scaled = scaler.transform([input_values])
+
+        # Predict the price
         prediction = gbr_model.predict(input_scaled)
         return round(prediction[0], 2), None
 
